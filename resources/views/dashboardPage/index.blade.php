@@ -11,7 +11,7 @@
                 <div class="numbers">
                   <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's AIML Patern</p>
                   <h5 class="font-weight-bolder mb-0">
-                    $53,000
+                    {{ $aiml }}
                   </h5>
                 </div>
               </div>
@@ -30,15 +30,15 @@
             <div class="row">
               <div class="col-10">
                 <div class="numbers">
-                  <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Users</p>
+                  <p class="text-sm mb-0 text-capitalize font-weight-bold">Today's Students</p>
                   <h5 class="font-weight-bolder mb-0">
-                    2,300
+                    {{ $mahasiswa }}
                   </h5>
                 </div>
               </div>
               <div class="col-1 px-0">
                 <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
-                    <i class="fa-solid fa-user fs-3"></i>
+                    <i class="fa-duotone fa-users fs-3"></i>
                 </div>
               </div>
             </div>
@@ -51,9 +51,9 @@
             <div class="row">
               <div class="col-10">
                 <div class="numbers">
-                  <p class="text-sm mb-0 text-capitalize font-weight-bold">New Clients</p>
+                  <p class="text-sm mb-0 text-capitalize font-weight-bold">Category</p>
                   <h5 class="font-weight-bolder mb-0">
-                    +3,462
+                    {{ $category }}
                   </h5>
                 </div>
               </div>
@@ -107,3 +107,4 @@
 
   </div>
 @endsection
+

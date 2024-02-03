@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Aiml;
+use App\Models\Category;
+use App\Models\Mahasiswa;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -11,9 +15,12 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        $aiml = Aiml::whereDate('created_at', Carbon::today())->count();
+        $mahasiswa = Mahasiswa::count();
+        $category = Category::count();
         return view('dashboardPage.index', [
             'page' => 'Dashboard'
-        ]);
+        ])->with(compact('aiml', 'mahasiswa', 'category'));
     }
 
     /**

@@ -51,7 +51,7 @@
                                 @foreach ($aimls as $aiml)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $aiml->category }}</td>
+                                        <td>{{ $aiml->Category->category }}</td>
                                         <td>{{ $aiml->patern }}</td>
                                         <td>{{ $aiml->template }}</td>
                                         <td>
@@ -82,7 +82,7 @@
                                                     @csrf
                                                     <div class="modal-body">
                                                         <p>Apakah Anda Yakin Ingin Menghapus Data
-                                                            <b>{{ $aiml->category }}</b>
+                                                            <b>{{ $aiml->patern }}</b>
                                                             ini?
                                                         </p>
                                                     </div>
@@ -115,19 +115,6 @@
                                                     <div class="modal-body">
                                                         <div class="row">
                                                             <div class="mb-3">
-                                                                <label for="category" class="form-label">Category</label>
-                                                                <input type="text"
-                                                                    class="form-control @error('category') is-invalid @enderror"
-                                                                    name="category" id="category" placeholder="Informasi Umum"
-                                                                    value="{{ old('category', $aiml->category) }}" autofocus
-                                                                    required>
-                                                                @error('category')
-                                                                    <div class="invalid-feedback">
-                                                                        {{ $message }}
-                                                                    </div>
-                                                                @enderror
-                                                            </div>
-                                                            <div class="mb-3">
                                                                 <label for="patern" class="form-label">Patern</label>
                                                                 <input type="text"
                                                                     class="form-control @error('patern') is-invalid @enderror"
@@ -142,12 +129,31 @@
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="template" class="form-label">Template</label>
-                                                                <input type="text"
-                                                                    class="form-control @error('template') is-invalid @enderror"
-                                                                    name="template" id="template" placeholder="Nama saya ChatBot."
-                                                                    value="{{ old('template', $aiml->template) }}"
-                                                                    autofocus required>
+                                                                <textarea class="form-control @error('template') is-invalid @enderror"
+                                                                          name="template" id="template" placeholder="Nama saya ChatBot."
+                                                                          autofocus required>{{ old('template', $aiml->template) }}</textarea>
                                                                 @error('template')
+                                                                    <div class="invalid-feedback">
+                                                                        {{ $message }}
+                                                                    </div>
+                                                                @enderror
+                                                            </div>
+                                                            <div class="mb-3">
+                                                                <label for="category_id" class="form-label">Category</label>
+                                                                <select class="form-select @error('category_id') is-invalid @enderror"
+                                                                    name="category_id" id="category_id"
+                                                                    value="{{ old('category_id', $aiml->category_id) }}">
+                                                                    @foreach ($categorys as $category)
+                                                                        @if (old('category_id', $aiml->category_id) == $category->id)
+                                                                            <option value="{{ $category->id }}" selected>
+                                                                                {{ $category->category }}</option>
+                                                                        @else
+                                                                            <option value="{{ $category->id }}">
+                                                                                {{ $category->category }}</option>
+                                                                        @endif
+                                                                    @endforeach
+                                                                </select>
+                                                                @error('category_id')
                                                                     <div class="invalid-feedback">
                                                                         {{ $message }}
                                                                     </div>
@@ -187,19 +193,6 @@
                         <div class="modal-body">
                             <div class="row">
                                 <div class="mb-3">
-                                    <label for="category" class="form-label">Category</label>
-                                    <input type="text"
-                                        class="form-control @error('category') is-invalid @enderror"
-                                        name="category" id="category" placeholder="Informasi Umum"
-                                        value="{{ old('category') }}" autofocus
-                                        required>
-                                    @error('category')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                </div>
-                                <div class="mb-3">
                                     <label for="patern" class="form-label">Patern</label>
                                     <input type="text"
                                         class="form-control @error('patern') is-invalid @enderror"
@@ -214,12 +207,26 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="template" class="form-label">Template</label>
-                                    <input type="text"
-                                        class="form-control @error('template') is-invalid @enderror"
-                                        name="template" id="template" placeholder="Nama saya ChatBot."
-                                        value="{{ old('template') }}"
-                                        autofocus required>
+                                    <textarea class="form-control @error('template') is-invalid @enderror"
+                                              name="template" id="template" placeholder="Nama saya ChatBot."
+                                              autofocus required>{{ old('template') }}</textarea>
                                     @error('template')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
+                                </div>
+                                <div class="mb-3">
+                                    <label for="category_id" class="form-label">Category</label>
+                                    <select class="form-select @error('category_id') is-invalid @enderror" name="category_id"
+                                        id="category_id">
+                                        @foreach ($categorys as $category)
+                                            <option value="{{ $category->id }}" selected>
+                                                {{ $category->category }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('category_id')
                                         <div class="invalid-feedback">
                                             {{ $message }}
                                         </div>

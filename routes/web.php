@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AimlController;
 use App\Http\Controllers\authController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\RegisterController;
@@ -23,12 +25,21 @@ Route::get('/', function () {
     return redirect('/dashboard');
 });
 
+Route::middleware(['web'])->group(function () {
+    Route::get('/chat', function () {
+        return view('chat');
+    });
+
+    Route::post('/chat', [ChatController::class, 'chat']);
+});
+
 Route::prefix('/dashboard')->middleware('auth')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-    Route::resource('/user', userController::class)->middleware('auth');
-    Route::post('/user/reset-password', [userController::class, 'resetPasswordAdmin'])->name('user.password')->middleware('auth');
-    Route::resource('/aiml', AimlController::class)->middleware('auth');
-    Route::resource('/mahasiswa', MahasiswaController::class)->middleware('auth');
+    Route::resource('/user', userController::class);
+    Route::post('/user/reset-password', [userController::class, 'resetPasswordAdmin'])->name('user.password');
+    Route::resource('/aiml', AimlController::class);
+    Route::resource('/mahasiswa', MahasiswaController::class);
+    Route::resource('/category', CategoryController::class);
 });
 Route::controller(authController::class)->group(function () {
     Route::get('/login', 'index')->name('login')->middleware('guest');
