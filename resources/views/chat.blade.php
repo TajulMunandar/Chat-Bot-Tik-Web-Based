@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,7 @@
         }
 
         #chat-container {
-            max-width: 400px;
+            max-width: 600px;
             margin: 20px auto;
             background-color: #fff;
             border-radius: 8px;
@@ -60,15 +61,13 @@
         }
     </style>
 </head>
+
 <body>
     <div id="chat-container">
         <div id="chat-history"></div>
         <div id="user-input-container">
-            <form id="chat-form" action="/chat" method="post">
-                @csrf
-                <input type="text" name="user_input" id="user-input" placeholder="Tulis pesan...">
-                <button type="submit" id="send-button">Kirim</button>
-            </form>
+            <input type="text" name="user_input" id="user-input" placeholder="Tulis pesan...">
+            <button type="button" id="send-button" onclick="sendMessage()">Kirim</button>
         </div>
     </div>
 
@@ -84,36 +83,37 @@
             }
 
             fetch('/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                body: JSON.stringify({
-                    user_input: userInput,
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                var chatHistory = document.getElementById('chat-history');
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        user_input: userInput,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var chatHistory = document.getElementById('chat-history');
 
-                // Tambahkan pesan pengguna dan jawaban chatbot ke riwayat percakapan
-                chatHistory.innerHTML += '<div>User: ' + userInput + '</div>';
-                if (data && data.response) {
-                    chatHistory.innerHTML += '<div class="bot-message">Bot: ' + data.response + '</div>';
-                } else {
-                    console.error('Error: Invalid server response');
-                }
+                    // Tambahkan pesan pengguna dan jawaban chatbot ke riwayat percakapan
+                    chatHistory.innerHTML += '<div style="margin-bottom: 10px">User: ' + userInput + '</div>';
+                    if (data && data.response) {
+                        chatHistory.innerHTML += '<div class="bot-message">Bot: ' + data.response + '</div>';
+                    } else {
+                        console.error('Error: Invalid server response');
+                    }
 
-                document.getElementById('user-input').value = '';
+                    document.getElementById('user-input').value = '';
 
-                // Auto scroll ke bagian bawah riwayat percakapan
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+                    // Auto scroll ke bagian bawah riwayat percakapan
+                    chatHistory.scrollTop = chatHistory.scrollHeight;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
         }
     </script>
 </body>
+
 </html>
