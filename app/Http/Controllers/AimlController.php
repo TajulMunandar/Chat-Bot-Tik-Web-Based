@@ -2,9 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Aiml;
-use App\Models\Category;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
+
+use SimpleXMLElement;
 
 class AimlController extends Controller
 {
@@ -13,92 +18,130 @@ class AimlController extends Controller
      */
     public function index()
     {
-        $categorys = Category::all();
-        $aimls = Aiml::with('category')->get();
-        return view('dashboardPage.aiml', [
-            'page' => 'Aiml'
-        ])->with(compact('aimls', 'categorys'));
+        $page = "Aiml";
+        $aimls = $this->getAimlData(); // Mendapatkan data dari XML
+        return view('dashboardPage.aiml', ['aimls' => $aimls])->with(compact('page'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    // Metode untuk mendapatkan data dari file XML
+    private function getAimlData()
     {
-        //
+        $aimlFilePath = storage_path('app/public/chatbot.xml');
+        $aimlData = [];
+
+        if (file_exists($aimlFilePath)) {
+            $xml = simplexml_load_file($aimlFilePath);
+            foreach ($xml->category as $category) {
+                $randomElement = $category->template->random ?? null;
+                $template = [
+                    'pattern' => (string)$category->pattern,
+                    'template' => ($randomElement) ? ['randomOptions' => $this->getRandomOptions($randomElement)] : (string)$category->template,
+                ];
+
+                $aimlData[] = $template;
+            }
+        }
+
+        return $aimlData;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    private function getRandomOptions($randomElement)
+    {
+        $randomOptions = [];
+        foreach ($randomElement->li as $li) {
+            $randomOptions[] = (string)$li;
+        }
+        return $randomOptions;
+    }
+
+    // Metode untuk menyimpan data ke file XML
+    private function saveAimlData($aimlData)
+    {
+        $aimlFilePath = storage_path('app/public/chatbot.xml'); // Sesuaikan path sesuai kebutuhan
+
+        $xml = new SimpleXMLElement('<aiml></aiml>');
+        foreach ($aimlData as $aimlItem) {
+            $category = $xml->addChild('category');
+            $category->addChild('pattern', $aimlItem['pattern']);
+
+            // Check if the template contains randomOptions
+            if (isset($aimlItem['template']['randomOptions'])) {
+                $template = $category->addChild('template');
+                $random = $template->addChild('random');
+                foreach ($aimlItem['template']['randomOptions'] as $option) {
+                    $random->addChild('li', $option);
+                }
+            } else {
+                // If no randomOptions, add the template directly
+                $category->addChild('template', $aimlItem['template']);
+            }
+        }
+
+        $xml->asXML($aimlFilePath);
+    }
+
     public function store(Request $request)
     {
-        try {
-            $validated = $request->validate([
-                'patern' => 'required',
-                'template' => 'required',
-                'category_id' => 'required',
-            ]);
+        $validated = $request->validate([
+            'patern' => 'required',
+            'template' => 'required',
+        ]);
 
-            Aiml::create($validated);
+        $aimlData = $this->getAimlData();
+        $template = $this->parseTemplate($validated['template']);
 
-            return redirect('/dashboard/aiml')->with('success', 'Aiml baru berhasil dibuat!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect('/dashboard/aiml')->with('failed', $e->getMessage());
-        } catch (\Exception $e) {
-            return redirect('/dashboard/aiml')->with('failed', $e->getMessage());
+        $aimlData[] = [
+            'pattern' => $validated['patern'],
+            'template' => $template,
+        ];
+
+        $this->saveAimlData($aimlData);
+
+        return redirect('/dashboard/aiml')->with('success', 'AIML baru berhasil ditambahkan!');
+    }
+
+    public function update(Request $request, $key)
+    {
+        $validated = $request->validate([
+            'patern' => 'required',
+            'template' => 'required',
+        ]);
+
+        $aimlData = $this->getAimlData();
+        $template = $this->parseTemplate($validated['template']);
+
+        $aimlData[$key] = [
+            'pattern' => $validated['patern'],
+            'template' => $template,
+        ];
+
+        $this->saveAimlData($aimlData);
+
+        return redirect('/dashboard/aiml')->with('success', 'Data AIML berhasil diperbarui!');
+    }
+
+    private function parseTemplate($template)
+    {
+        if (strpos($template, ',') !== false) {
+            // Jika template mengandung koma, pecah template menjadi array
+            $options = array_map('trim', explode(',', $template));
+            return ['randomOptions' => $options];
+        } else {
+            // Jika tidak mengandung koma, kembalikan template langsung
+            return $template;
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function destroy($key)
     {
-        //
-    }
+        $aimlData = $this->getAimlData();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Aiml $aiml)
-    {
-        try {
-            $rules = [
-                'patern' => 'required',
-                'template' => 'required',
-                'category_id' => 'required',
-            ];
-            $validatedData = $request->validate($rules);
-
-            Aiml::where('id', $aiml->id)->update($validatedData);
-
-            return redirect('/dashboard/aiml')->with('success', 'Aiml berhasil diperbarui!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            return redirect('/dashboard/aiml')->with('failed', $e->getMessage());
-        } catch (\Exception $e) {
-            return redirect('/dashboard/aiml')->with('failed', $e->getMessage());
+        if (array_key_exists($key, $aimlData)) {
+            unset($aimlData[$key]);
+            $this->saveAimlData($aimlData);
+            return redirect('/dashboard/aiml')->with('success', 'AIML data has been deleted!');
         }
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Aiml $aiml)
-    {
-        try {
-            Aiml::destroy($aiml->id);
-            return redirect('/dashboard/aiml')->with('success', "Aiml dengan Nama $aiml->patern berhasil dihapus!");
-        } catch (\Illuminate\Database\QueryException $e) {
-            return redirect('/dashboard/aiml')->with('failed', "Aiml $aiml->patern tidak bisa dihapus karena sedang digunakan!");
-        }
+        return redirect('/dashboard/aiml')->with('failed', 'Failed to delete AIML data!');
     }
 }

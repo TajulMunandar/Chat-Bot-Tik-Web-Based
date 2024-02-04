@@ -1,11 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
-use App\Models\Aiml;
+use Illuminate\Support\Facades\File;
 use App\Models\Category;
 use App\Models\Mahasiswa;
-use Carbon\Carbon;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -15,7 +14,23 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $aiml = Aiml::whereDate('created_at', Carbon::today())->count();
+        $aimlFile = storage_path('app/public/chatbot.xml');
+        $xmlString = File::get($aimlFile);
+
+        // Mengonversi string XML menjadi objek SimpleXMLElement
+        $xml = simplexml_load_string($xmlString);
+
+        // Inisialisasi jumlah pola
+        $aiml = 0;
+
+        // Menghitung jumlah pola
+        foreach ($xml->category as $category) {
+            $pattern = Str::lower(trim((string)$category->pattern));
+            if (!empty($pattern)) {
+                $aiml++;
+            }
+        }
+
         $mahasiswa = Mahasiswa::count();
         $category = Category::count();
         return view('dashboardPage.index', [

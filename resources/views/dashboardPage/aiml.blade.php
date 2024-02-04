@@ -41,33 +41,41 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Category</th>
                                     <th>Patern</th>
                                     <th>Template</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($aimls as $aiml)
+                                @foreach ($aimls as $key => $aiml)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $aiml->Category->category }}</td>
-                                        <td>{{ $aiml->patern }}</td>
-                                        <td>{{ $aiml->template }}</td>
+                                        <td>{{ $aiml['pattern'] }}</td>
+                                        <td>
+                                            @if (is_array($aiml['template']))
+                                                @if (isset($aiml['template']['randomOptions']))
+                                                    {{ implode(', ', $aiml['template']['randomOptions']) }}
+                                                @else
+                                                    {{ $aiml['template']['template'] }}
+                                                @endif
+                                            @else
+                                                {{ $aiml['template'] }}
+                                            @endif
+                                        </td>
                                         <td>
                                             <button type="button" class="btn btn-warning" data-bs-toggle="modal"
-                                                data-bs-target="#editModal{{ $loop->iteration }}">
+                                                data-bs-target="#editModal{{ $key }}">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
                                             <button id="delete-button" class="btn btn-danger" id="delete-button"
-                                                data-bs-toggle="modal" data-bs-target="#hapusModal{{ $loop->iteration }}">
+                                                data-bs-toggle="modal" data-bs-target="#hapusModal{{ $key }}">
                                                 <i class="fa-solid fa-trash"></i>
                                             </button>
                                         </td>
                                     </tr>
 
                                     {{--  MODAL Delete  --}}
-                                    <div class="modal fade" id="hapusModal{{ $loop->iteration }}" tabindex="-1"
+                                    <div class="modal fade" id="hapusModal{{ $key }}" tabindex="-1"
                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
@@ -76,13 +84,13 @@
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                                 </div>
-                                                <form action="{{ route('aiml.destroy', $aiml->id) }}"
-                                                    method="post" enctype="multipart/form-data">
+                                                <form action="{{ route('aiml.destroy', $key) }}" method="post"
+                                                    enctype="multipart/form-data">
                                                     @method('delete')
                                                     @csrf
                                                     <div class="modal-body">
                                                         <p>Apakah Anda Yakin Ingin Menghapus Data
-                                                            <b>{{ $aiml->patern }}</b>
+                                                            <b>"{{ $aiml['pattern'] }}"</b>
                                                             ini?
                                                         </p>
                                                     </div>
@@ -99,7 +107,7 @@
                                     {{--  MODAL Delete  --}}
 
                                     {{-- Modal Edit --}}
-                                    <div class="modal fade" id="editModal{{ $loop->iteration }}" tabindex="-1"
+                                    <div class="modal fade" id="editModal{{ $key }}" tabindex="-1"
                                         aria-labelledby="exampleModalLabel" aria-hidden="true">
                                         <div class="modal-dialog">
                                             <div class="modal-content">
@@ -108,8 +116,8 @@
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                                 </div>
-                                                <form action="{{ route('aiml.update', $aiml->id) }}"
-                                                    method="POST" enctype="multipart/form-data">
+                                                <form action="{{ route('aiml.update', $key) }}" method="POST"
+                                                    enctype="multipart/form-data">
                                                     @method('put')
                                                     @csrf
                                                     <div class="modal-body">
@@ -118,9 +126,9 @@
                                                                 <label for="patern" class="form-label">Patern</label>
                                                                 <input type="text"
                                                                     class="form-control @error('patern') is-invalid @enderror"
-                                                                    name="patern" id="patern" placeholder="Siapa nama kamu?"
-                                                                    value="{{ old('patern', $aiml->patern) }}"
-                                                                    autofocus required>
+                                                                    name="patern" id="patern"
+                                                                    placeholder="Siapa nama kamu?"
+                                                                    value="{{ $aiml['pattern'] }}" autofocus required>
                                                                 @error('patern')
                                                                     <div class="invalid-feedback">
                                                                         {{ $message }}
@@ -129,35 +137,24 @@
                                                             </div>
                                                             <div class="mb-3">
                                                                 <label for="template" class="form-label">Template</label>
-                                                                <textarea class="form-control @error('template') is-invalid @enderror"
-                                                                          name="template" id="template" placeholder="Nama saya ChatBot."
-                                                                          autofocus required>{{ old('template', $aiml->template) }}</textarea>
+                                                                @if (isset($aiml['template']['randomOptions']) && is_array($aiml['template']['randomOptions']))
+                                                                    {{-- Jika ada struktur random, tampilkan randomOptions --}}
+                                                                    <textarea class="form-control @error('template') is-invalid @enderror" name="template" id="randomOptions"
+                                                                        placeholder="Pilihan acak dipisahkan dengan koma (,)">{{ implode(', ', $aiml['template']['randomOptions']) }}</textarea>
+                                                                @else
+                                                                    {{-- Jika tidak ada struktur random, tampilkan template --}}
+                                                                    <textarea class="form-control @error('template') is-invalid @enderror" name="template" id="template"
+                                                                        placeholder="Nama saya ChatBot." autofocus required>{{ is_array($aiml['template']) ? implode(', ', $aiml['template']) : $aiml['template'] }}</textarea>
+                                                                @endif
                                                                 @error('template')
                                                                     <div class="invalid-feedback">
                                                                         {{ $message }}
                                                                     </div>
                                                                 @enderror
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="category_id" class="form-label">Category</label>
-                                                                <select class="form-select @error('category_id') is-invalid @enderror"
-                                                                    name="category_id" id="category_id"
-                                                                    value="{{ old('category_id', $aiml->category_id) }}">
-                                                                    @foreach ($categorys as $category)
-                                                                        @if (old('category_id', $aiml->category_id) == $category->id)
-                                                                            <option value="{{ $category->id }}" selected>
-                                                                                {{ $category->category }}</option>
-                                                                        @else
-                                                                            <option value="{{ $category->id }}">
-                                                                                {{ $category->category }}</option>
-                                                                        @endif
-                                                                    @endforeach
-                                                                </select>
-                                                                @error('category_id')
-                                                                    <div class="invalid-feedback">
-                                                                        {{ $message }}
-                                                                    </div>
-                                                                @enderror
+                                                                <small class="form-text text-muted">
+                                                                    Jika template memiliki struktur random, akhiri setiap
+                                                                    kalimat dengan tanda koma (,).
+                                                                </small>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -194,11 +191,9 @@
                             <div class="row">
                                 <div class="mb-3">
                                     <label for="patern" class="form-label">Patern</label>
-                                    <input type="text"
-                                        class="form-control @error('patern') is-invalid @enderror"
+                                    <input type="text" class="form-control @error('patern') is-invalid @enderror"
                                         name="patern" id="patern" placeholder="Siapa nama kamu?"
-                                        value="{{ old('patern') }}"
-                                        autofocus required>
+                                        value="{{ old('patern') }}" autofocus required>
                                     @error('patern')
                                         <div class="invalid-feedback">
                                             {{ $message }}
@@ -207,30 +202,16 @@
                                 </div>
                                 <div class="mb-3">
                                     <label for="template" class="form-label">Template</label>
-                                    <textarea class="form-control @error('template') is-invalid @enderror"
-                                              name="template" id="template" placeholder="Nama saya ChatBot."
-                                              autofocus required>{{ old('template') }}</textarea>
+                                    <textarea class="form-control @error('template') is-invalid @enderror" name="template" id="template"
+                                        placeholder="Nama saya ChatBot." autofocus required>{{ old('template') }}</textarea>
                                     @error('template')
                                         <div class="invalid-feedback">
                                             {{ $message }}
                                         </div>
                                     @enderror
-                                </div>
-                                <div class="mb-3">
-                                    <label for="category_id" class="form-label">Category</label>
-                                    <select class="form-select @error('category_id') is-invalid @enderror" name="category_id"
-                                        id="category_id">
-                                        @foreach ($categorys as $category)
-                                            <option value="{{ $category->id }}" selected>
-                                                {{ $category->category }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('category_id')
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
+                                    <small class="form-text text-muted">
+                                        Jika template memiliki struktur random, akhiri setiap kalimat dengan tanda koma
+                                        (,).</small>
                                 </div>
                             </div>
                         </div>
@@ -242,6 +223,7 @@
                 </div>
             </div>
         </div>
+
         {{--  MODAL ADD  --}}
 
     </div>

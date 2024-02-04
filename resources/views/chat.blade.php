@@ -82,20 +82,23 @@
                 return;
             }
 
-            fetch('/chat', {
+            fetch('http://localhost:5000/process_aiml', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
                     },
                     body: JSON.stringify({
                         user_input: userInput,
                     }),
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     var chatHistory = document.getElementById('chat-history');
-
                     // Tambahkan pesan pengguna dan jawaban chatbot ke riwayat percakapan
                     chatHistory.innerHTML += '<div style="margin-bottom: 10px">User: ' + userInput + '</div>';
                     if (data && data.response) {
