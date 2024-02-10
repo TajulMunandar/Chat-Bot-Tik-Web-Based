@@ -22,12 +22,24 @@ def process_random_element(random_element):
 def get_aiml_response(user_input):
     for category in root.findall(".//category"):
         pattern = category.find('pattern').text
+        # Jika pola cocok secara langsung
         if user_input.lower() == pattern.lower():
             template = category.find('template')
             random_element = template.find('random')
             if random_element is not None:
                 return process_random_element(random_element)
-            return template.text.strip()
+            else:
+                return template.text.strip()
+        # Jika pola mengandung wildcard
+        elif '*' in pattern:
+            pattern_parts = pattern.split('*')
+            if pattern_parts[0].lower() in user_input.lower() and pattern_parts[1].lower() in user_input.lower():
+                template = category.find('template')
+                random_element = template.find('random')
+                if random_element is not None:
+                    return process_random_element(random_element)
+                else:
+                    return template.text.strip()
     return "Saya tidak mengerti pertanyaan Anda."
 
 @app.route('/process_aiml', methods=['POST'])

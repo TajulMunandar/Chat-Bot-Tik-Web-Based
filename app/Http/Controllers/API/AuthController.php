@@ -22,6 +22,6 @@ class AuthController extends Controller
             return response()->json(['access_token' => $token], 200);
         }
 
-        return response()->json(['message' => 'Login gagal, periksa kembali username atau password Anda'], 401);
+        return response()->json(['access_token' => null], 200);
     }
 }

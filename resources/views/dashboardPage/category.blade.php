@@ -203,7 +203,9 @@
 
                 // Ganti teks "Next" dengan ikon setiap kali tabel di-redraw
                 $('.page-link:contains("Next")').html(nextIcon);
+
             });
+
         });
     </script>
 @endsection
