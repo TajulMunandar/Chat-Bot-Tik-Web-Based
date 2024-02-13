@@ -24,4 +24,11 @@ class AuthController extends Controller
 
         return response()->json(['access_token' => null], 200);
     }
+
+    public function profil(Request $request)
+    {
+        $user = Auth::user();
+        return response()->json($user, 200);
+    }
+
 }

@@ -20,3 +20,4 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::post('/login', [authController::class, 'authenticate']);
+Route::get('/user', [authController::class, 'profil']);

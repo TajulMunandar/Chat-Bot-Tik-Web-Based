@@ -45,7 +45,6 @@ Route::prefix('/dashboard')->middleware('auth')->group(function () {
     Route::post('/user/reset-password', [userController::class, 'resetPasswordAdmin'])->name('user.password');
     Route::resource('/aiml', AimlController::class);
     Route::resource('/mahasiswa', MahasiswaController::class);
-    Route::resource('/category', CategoryController::class);
 });
 Route::controller(authController::class)->group(function () {
     Route::get('/login', 'index')->name('login')->middleware('guest');
