@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\File;
 use App\Models\Category;
+use App\Models\feedback;
 use App\Models\Mahasiswa;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -32,10 +33,10 @@ class DashboardController extends Controller
         }
 
         $mahasiswa = Mahasiswa::count();
-        $category = Category::count();
+        $feedback = feedback::count();
         return view('dashboardPage.index', [
             'page' => 'Dashboard'
-        ])->with(compact('aiml', 'mahasiswa', 'category'));
+        ])->with(compact('aiml', 'mahasiswa', 'feedback'));
     }
 
     /**

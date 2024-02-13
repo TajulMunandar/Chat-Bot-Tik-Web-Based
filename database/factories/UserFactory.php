@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -15,13 +17,18 @@ class UserFactory extends Factory
      *
      * @return array<string, mixed>
      */
+
+     protected $model = User::class;
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
             'username' => 'admin',
-            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
-            'isAdmin' => 1
+            'password' => Hash::make('admin'), // Menggunakan Hash::make() untuk mengenkripsi password
+            'nim' => '123123',
+            'name' => $this->faker->name(), // Menggunakan $this->faker->name() untuk generate nama secara random
+            'isAdmin' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 

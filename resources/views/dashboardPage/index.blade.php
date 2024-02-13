@@ -51,9 +51,9 @@
             <div class="row">
               <div class="col-10">
                 <div class="numbers">
-                  <p class="text-sm mb-0 text-capitalize font-weight-bold">Category</p>
+                  <p class="text-sm mb-0 text-capitalize font-weight-bold">Feedback</p>
                   <h5 class="font-weight-bolder mb-0">
-                    {{ $category }}
+                    {{ $feedback }}
                   </h5>
                 </div>
               </div>

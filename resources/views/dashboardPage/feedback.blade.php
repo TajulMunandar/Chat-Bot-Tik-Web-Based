@@ -41,15 +41,15 @@
                             <thead>
                                 <tr>
                                     <th>No</th>
-                                    <th>Category</th>
+                                    <th>Feedback</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($categorys as $category)
+                                @foreach ($feedbacks as $feedback)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $category->category }}</td>
+                                        <td>{{ $feedback->feedback }}</td>
                                         <td>
                                             <button type="button" class="btn btn-warning" data-bs-toggle="modal"
                                                 data-bs-target="#editModal{{ $loop->iteration }}">
@@ -68,17 +68,17 @@
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Hapus Data Category</h5>
+                                                    <h5 class="modal-title" id="exampleModalLabel">Hapus Data Feedback</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                                 </div>
-                                                <form action="{{ route('category.destroy', $category->id) }}"
+                                                <form action="{{ route('feedback.destroy', $feedback->id) }}"
                                                     method="post" enctype="multipart/form-data">
                                                     @method('delete')
                                                     @csrf
                                                     <div class="modal-body">
                                                         <p>Apakah Anda Yakin Ingin Menghapus Data
-                                                            <b>{{ $category->category }}</b>
+                                                            <b>{{ $feedback->feedback }}</b>
                                                             ini?
                                                         </p>
                                                     </div>
@@ -100,24 +100,24 @@
                                         <div class="modal-dialog">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLabel">Edit Data Category</h5>
+                                                    <h5 class="modal-title" id="exampleModalLabel">Edit Data Feedback</h5>
                                                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                         aria-label="Close"></button>
                                                 </div>
-                                                <form action="{{ route('category.update', $category->id) }}"
+                                                <form action="{{ route('feedback.update', $feedback->id) }}"
                                                     method="POST" enctype="multipart/form-data">
                                                     @method('put')
                                                     @csrf
                                                     <div class="modal-body">
                                                         <div class="row">
                                                             <div class="mb-3">
-                                                                <label for="category" class="form-label">Category</label>
+                                                                <label for="feedback" class="form-label">Feedback</label>
                                                                 <input type="text"
-                                                                    class="form-control @error('category') is-invalid @enderror"
-                                                                    name="category" id="category" placeholder="Informasi Umum"
-                                                                    value="{{ old('category', $category->category) }}" autofocus
+                                                                    class="form-control @error('feedback') is-invalid @enderror"
+                                                                    name="feedback" id="feedback" placeholder="Informasi Umum"
+                                                                    value="{{ old('feedback', $feedback->feedback) }}" autofocus
                                                                     required>
-                                                                @error('category')
+                                                                @error('feedback')
                                                                     <div class="invalid-feedback">
                                                                         {{ $message }}
                                                                     </div>
@@ -149,21 +149,21 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Tambah Data Category</h5>
+                        <h5 class="modal-title" id="exampleModalLabel">Tambah Data Feedback</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <form action="{{ route('category.store') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('feedback.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="modal-body">
                             <div class="row">
                                 <div class="mb-3">
-                                    <label for="category" class="form-label">Category</label>
+                                    <label for="feedback" class="form-label">feedback</label>
                                     <input type="text"
-                                        class="form-control @error('category') is-invalid @enderror"
-                                        name="category" id="category" placeholder="Informasi Umum"
-                                        value="{{ old('category') }}" autofocus
+                                        class="form-control @error('feedback') is-invalid @enderror"
+                                        name="feedback" id="feedback" placeholder="Informasi Umum"
+                                        value="{{ old('feedback') }}" autofocus
                                         required>
-                                    @error('category')
+                                    @error('feedback')
                                         <div class="invalid-feedback">
                                             {{ $message }}
                                         </div>

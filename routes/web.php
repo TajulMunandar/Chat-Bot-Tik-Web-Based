@@ -4,6 +4,7 @@ use App\Http\Controllers\AimlController;
 use App\Http\Controllers\authController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\userController;
@@ -45,6 +46,7 @@ Route::prefix('/dashboard')->middleware('auth')->group(function () {
     Route::post('/user/reset-password', [userController::class, 'resetPasswordAdmin'])->name('user.password');
     Route::resource('/aiml', AimlController::class);
     Route::resource('/mahasiswa', MahasiswaController::class);
+    Route::resource('/feedback', FeedbackController::class);
 });
 Route::controller(authController::class)->group(function () {
     Route::get('/login', 'index')->name('login')->middleware('guest');

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\FeedbackController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,3 +22,4 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [authController::class, 'authenticate']);
 Route::get('/user', [authController::class, 'profil']);
+Route::get('/feedback', [FeedbackController::class, 'store']);
