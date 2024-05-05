@@ -12,6 +12,7 @@ class FeedbackController extends Controller
     {
         try {
             $validatedData = $request->validate([
+                'user_id' => 'required',
                 'feedback' => 'required',
             ]);
 

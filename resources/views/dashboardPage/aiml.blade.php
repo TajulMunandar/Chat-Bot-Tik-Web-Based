@@ -50,17 +50,47 @@
                                 @foreach ($aimls as $key => $aiml)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $aiml['pattern'] }}</td>
+                                        <td>
+                                            @php
+                                                $pattern = $aiml['pattern'];
+                                                $words = explode(' ', $pattern);
+                                                if (count($words) > 5) {
+                                                    $pattern = implode(' ', array_slice($words, 0, 5)) . '...';
+                                                }
+                                            @endphp
+                                            {{ $pattern }}
+                                        </td>
                                         <td>
                                             @if (is_array($aiml['template']))
                                                 @if (isset($aiml['template']['randomOptions']))
-                                                    {{ implode(', ', $aiml['template']['randomOptions']) }}
+                                                    @php
+                                                        $randomOptions = array_slice(
+                                                            $aiml['template']['randomOptions'],
+                                                            0,
+                                                            2,
+                                                        );
+                                                    @endphp
+                                                    {{ implode(', ', $randomOptions) }}
+                                                    @if (count($aiml['template']['randomOptions']) > 2)
+                                                        ...
+                                                    @endif
                                                 @else
-                                                    {{ $aiml['template']['template'] }}
+                                                    @php
+                                                        $slicedArray = array_slice($aiml['template'], 0, 3);
+                                                    @endphp
+                                                    {{ implode(', ', $slicedArray) }}
+                                                    @if (count($aiml['template']) > 3)
+                                                        ...
+                                                    @endif
                                                 @endif
                                             @else
-                                                {{ $aiml['template'] }}
+                                                {{ mb_substr($aiml['template'], 0, 50) }}
+                                                @if (mb_strlen($aiml['template']) > 50)
+                                                    ...
+                                                @endif
                                             @endif
+
+
                                         </td>
                                         <td>
                                             <button type="button" class="btn btn-warning" data-bs-toggle="modal"
@@ -242,13 +272,18 @@
             $('.page-link:contains("Next")').html(nextIcon);
 
             // Tambahkan event handler untuk setiap kali tabel di-redraw
-            $('#myTable').on('draw.dt', function() {
-                // Ganti teks "Previous" dengan ikon setiap kali tabel di-redraw
+            if ($.fn.DataTable.isDataTable('#myTable')) {
+                // Dapatkan objek DataTable
+                var table = $('#myTable').DataTable();
+
+                // Set ulang opsi pageLength menjadi 100
+                table.page.len(100).draw();
+
                 $('.page-link:contains("Previous")').html(prevIcon);
 
-                // Ganti teks "Next" dengan ikon setiap kali tabel di-redraw
+                // Ganti teks "Next" dengan ikon saat dokumen pertama kali dimuat
                 $('.page-link:contains("Next")').html(nextIcon);
-            });
+            }
         });
     </script>
 @endsection

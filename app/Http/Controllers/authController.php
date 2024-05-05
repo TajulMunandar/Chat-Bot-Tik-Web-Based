@@ -23,9 +23,15 @@ class authController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
+            $user = Auth::user();
 
-            return redirect()->intended('/');
+            if ($user->isAdmin == 1) {
+                $request->session()->regenerate();
+                return redirect()->intended('/');
+            } else {
+                Auth::logout();
+                return back()->with('failed', 'Anda tidak memiliki izin untuk mengakses halaman ini.');
+            }
         }
 
         return back()->with('failed', 'Login Gagal, periksa kembali username atau password anda!');
@@ -41,7 +47,4 @@ class authController extends Controller
 
         return redirect('/login');
     }
-
-
-
 }
